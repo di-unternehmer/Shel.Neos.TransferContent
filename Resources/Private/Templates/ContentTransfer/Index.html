@@ -11,6 +11,18 @@
                 <fieldset class="neos-span5">
                     <legend>{neos:backend.translate(id: 'Shel.Neos.TransferContent:ContentTransfer:copyNode')}</legend>
 
+                    <div class="neos-control-group{f:validation.ifHasErrors(for: 'mode', then: ' neos-error')}">
+                        <label class="neos-control-label" for="sourceSite">
+                            {neos:backend.translate(id: 'Shel.Neos.TransferContent:ContentTransfer:transferMode')}
+                        </label>
+                        <div class="neos-controls">
+                            <f:form.select options="{modes}" optionValueField="key" optionLabelField="value"
+                                           id="mode" class="neos-span12" name="mode" value="copy"/>
+                            <f:render partial="Module/Shared/FieldValidationResults"
+                                      arguments="{fieldname: 'mode'}"/>
+                        </div>
+                    </div>
+
                     <div class="neos-control-group{f:validation.ifHasErrors(for: 'sourceSite', then: ' neos-error')}">
                         <label class="neos-control-label" for="sourceSite">
                             {neos:backend.translate(id: 'Shel.Neos.TransferContent:ContentTransfer:sourceSite')}
@@ -60,7 +72,7 @@
                     </div>
                 </fieldset>
             </div>
-            <f:form.submit value="{neos:backend.translate(id: 'Shel.Neos.TransferContent:ContentTransfer:copy')}"
+            <f:form.submit value="{neos:backend.translate(id: 'Shel.Neos.TransferContent:ContentTransfer:execute')}"
                            class="neos-button neos-button-primary"/>
         </fieldset>
     </f:form>

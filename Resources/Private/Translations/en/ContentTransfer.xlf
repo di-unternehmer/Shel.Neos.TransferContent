@@ -24,10 +24,18 @@
             <trans-unit id="targetParentNodePath" xml:space="preserve">
                 <source>Identifier of document node, the copied node will be appended to as child</source>
             </trans-unit>
-            <trans-unit id="copy" xml:space="preserve">
+            <trans-unit id="execute" xml:space="preserve">
+                <source>Execute</source>
+            </trans-unit>
+            <trans-unit id="mode.copy" xml:space="preserve">
                 <source>Copy</source>
             </trans-unit>
-
+            <trans-unit id="mode.move" xml:space="preserve">
+                <source>Move</source>
+            </trans-unit>
+            <trans-unit id="transferMode" xml:space="preserve">
+                <source>Transfer Mode</source>
+            </trans-unit>
             <trans-unit id="error.sourceNodeNotFound" xml:space="preserve">
                 <source>Source node not found</source>
             </trans-unit>
@@ -48,6 +56,12 @@
             </trans-unit>
             <trans-unit id="message.copied" xml:space="preserve">
                 <source>The node was copied</source>
+            </trans-unit>
+            <trans-unit id="message.moved" xml:space="preserve">
+                <source>The node was moved</source>
+            </trans-unit>
+            <trans-unit id="warning.sourceNodeDimensionNull" xml:space="preserve">
+                <source>No source dimension found for {0}</source>
             </trans-unit>
         </body>
     </file>

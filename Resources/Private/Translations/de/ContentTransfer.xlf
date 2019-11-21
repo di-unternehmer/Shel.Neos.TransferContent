@@ -31,9 +31,22 @@
                 <source>Identifier of document node, the copied node will be appended to as child</source>
                 <target>Identifikator des Dokumentknotens, an den der kopierte Knoten angehängt werden soll</target>
             </trans-unit>
-            <trans-unit id="copy" xml:space="preserve">
+            <trans-unit id="execute" xml:space="preserve">
+                <source>Execute</source>
+                <target>Ausführen</target>
+            </trans-unit>
+
+            <trans-unit id="mode.copy" xml:space="preserve">
                 <source>Copy</source>
                 <target>Kopieren</target>
+            </trans-unit>
+            <trans-unit id="mode.move" xml:space="preserve">
+                <source>Move</source>
+                <target>Verschieben</target>
+            </trans-unit>
+            <trans-unit id="transferMode" xml:space="preserve">
+                <source>Transfer Mode</source>
+                <target>Übertragungsmodus</target>
             </trans-unit>
 
             <trans-unit id="error.sourceNodeNotFound" xml:space="preserve">
@@ -63,6 +76,10 @@
             <trans-unit id="message.copied" xml:space="preserve">
                 <source>The node was copied</source>
                 <target>Der Knoten wurde kopiert</target>
+            </trans-unit>
+            <trans-unit id="message.moved" xml:space="preserve">
+                <source>The node was moved</source>
+                <target>Der Knoten wurde verschoben</target>
             </trans-unit>
         </body>
     </file>

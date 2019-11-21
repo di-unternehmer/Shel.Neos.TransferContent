@@ -18,3 +18,27 @@ Neos:
             description: 'Shel.Neos.TransferContent:ContentTransfer:description'
             icon: 'fas fa-exchange-alt'
             privilegeTarget: 'Shel.Neos.TransferContent:Backend.Module.Management.ContentTransfer'
+
+Shel:
+  Neos:
+    TransferContent:
+      -
+        dimensions:
+          language:
+            - en
+          country:
+            - de
+        targetDimensions:
+          language: 'en'
+          country: 'de'
+
+      -
+        dimensions:
+          language:
+            - fr
+          country:
+            - de
+        targetDimensions:
+          language: 'fr'
+          country: 'de'
+

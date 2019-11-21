@@ -2,9 +2,13 @@
 
 namespace Shel\Neos\TransferContent\Controller;
 
+use Neos\ContentRepository\Domain\Repository\ContentDimensionRepository;
+use Neos\ContentRepository\Domain\Service\Context;
+use Neos\Eel\FlowQuery\FlowQuery;
 use Neos\Flow\Annotations as Flow;
 use Neos\Error\Messages\Message;
 use Neos\Flow\I18n\Translator;
+use Neos\Flow\ObjectManagement\ObjectManagerInterface;
 use Neos\Neos\Controller\Module\AbstractModuleController;
 use Neos\Neos\Domain\Model\Site;
 use Neos\Neos\Domain\Repository\SiteRepository;
@@ -22,6 +26,12 @@ class ContentTransferController extends AbstractModuleController
 {
 
     /**
+     * @Flow\InjectConfiguration(package="Shel.Neos.TransferContent")
+     * @var array
+     */
+    protected $dimensionSettings = array();
+
+    /**
      * @var NodeOperations
      * @Flow\Inject
      */
@@ -32,6 +42,12 @@ class ContentTransferController extends AbstractModuleController
      * @var SiteRepository
      */
     protected $siteRepository;
+
+    /**
+     * @Flow\Inject()
+     * @var ContentDimensionRepository
+     */
+    protected $contentDimensionRepository;
 
     /**
      * @Flow\Inject
@@ -50,8 +66,9 @@ class ContentTransferController extends AbstractModuleController
      * @param Site $sourceSite
      * @param Site $targetSite
      * @param string $targetParentNodePath
+     * @param string $mode
      */
-    public function indexAction(Site $sourceSite = null, Site $targetSite = null, $targetParentNodePath = '')
+    public function indexAction(Site $sourceSite = null, Site $targetSite = null, $targetParentNodePath = '', $mode = '')
     {
         $sites = $this->siteRepository->findOnline();
 
@@ -60,7 +77,25 @@ class ContentTransferController extends AbstractModuleController
             'sourceSite' => $sourceSite,
             'targetSite' => $targetSite,
             'targetParentNodePath' => $targetParentNodePath,
+            'modes' => $this->getModes()
         ]);
+    }
+
+    /**
+     * prepare categories for select box
+     *
+     * @return array
+     */
+    public function getModes() : array
+    {
+        $entries = array('copy', 'move');
+        foreach ($entries as $entry) {
+            $mode = new \stdClass();
+            $mode->key = $entry;
+            $mode->value = $this->translate('mode.' . $entry);
+            $modes[] = $mode;
+        }
+        return $modes;
     }
 
     /**
@@ -68,11 +103,14 @@ class ContentTransferController extends AbstractModuleController
      * @param Site $targetSite
      * @param string $sourceNodePath
      * @param string $targetParentNodePath
+     * @param string $mode
+     *
+     * @throws \Neos\Eel\Exception
+     * @throws \Neos\Flow\Mvc\Exception\StopActionException
      * @Flow\Validate(argumentName="sourceNodePath", type="\Neos\Flow\Validation\Validator\NotEmptyValidator")
      * @Flow\Validate(argumentName="targetParentNodePath", type="\Neos\Flow\Validation\Validator\NotEmptyValidator")
-     * @throws \Neos\Flow\Mvc\Exception\StopActionException
      */
-    public function copyNodeAction(Site $sourceSite, Site $targetSite, $sourceNodePath, $targetParentNodePath)
+    public function copyNodeAction(Site $sourceSite, Site $targetSite, $sourceNodePath, $targetParentNodePath, $mode = 'copy')
     {
         /** @var ContentContext $sourceContext */
         $sourceContext = $this->contextFactory->create([
@@ -123,11 +161,71 @@ class ContentTransferController extends AbstractModuleController
             );
         } else {
             try {
-                $this->nodeOperations->copy($sourceNode, $targetParentNode, 'into');
-                $this->addFlashMessage(
-                    $this->translate('message.copied'),
-                    'Success'
-                );
+
+                if ($mode === 'move')
+                {
+                    // Default language
+                    $this->nodeOperations->move($sourceNode, $targetParentNode, 'into');
+
+                    // Doesn't return an array with all dimensions combinations ... no clue why :(
+                    // $availableDimensions = $this->contentDimensionRepository->findAll();
+
+                    $dimensions = $this->dimensionSettings;
+
+                    if (!$dimensions) {
+                        $this->addFlashMessage(
+                            $this->translate('message.moved'),
+                            'Success'
+                        );
+                        $this->redirect('index', null, null, [
+                            'sourceSite' => $sourceSite,
+                            'targetSite' => $targetSite,
+                            'targetParentNodePath' => $targetParentNodePath
+                        ]);
+                    }
+
+                    // start move nodes for other dimension not default
+                    foreach ($dimensions as $dimension)
+                    {
+                        $sourceDimensionContext = $this->getDimensionContext(
+                            $sourceSite,
+                            $dimension['dimensions'],
+                            $dimension['targetDimensions']
+                        );
+
+                        $targetDimensionContext = $this->getDimensionContext(
+                            $targetSite,
+                            $dimension['dimensions'],
+                            $dimension['targetDimensions']
+                        );
+
+                        $sourceNodeDimension = $sourceDimensionContext->getNodeByIdentifier($sourceNodePath);
+                        $targetParentNodeDimension = $targetDimensionContext->getNodeByIdentifier($targetParentNodePath);
+
+                        if ($sourceNodeDimension && $targetParentNodeDimension) {
+                            $this->nodeOperations->move($sourceNodeDimension, $targetParentNodeDimension, 'into');
+                        } else {
+                            $this->addFlashMessage(
+                                $this->translate('warning.sourceNodeDimensionNull', [implode('_',$dimension['targetDimensions'])]),
+                                'Warning',
+                                Message::SEVERITY_WARNING
+                            );
+                        }
+                    }
+
+                    $this->addFlashMessage(
+                        $this->translate('message.moved'),
+                        'Success'
+                    );
+
+                } else {
+                    $this->nodeOperations->copy($sourceNode, $targetParentNode, 'into');
+                    $this->addFlashMessage(
+                        $this->translate('message.copied'),
+                        'Success'
+                    );
+                }
+
             } catch (NodeException $e) {
                 $this->addFlashMessage(
                     $this->translate('error.copyFailed', [$e->getReferenceCode()]),
@@ -141,6 +239,7 @@ class ContentTransferController extends AbstractModuleController
             'sourceSite' => $sourceSite,
             'targetSite' => $targetSite,
             'targetParentNodePath' => $targetParentNodePath,
+            'modes' => $this->getModes()
         ]);
     }
 
@@ -152,5 +251,24 @@ class ContentTransferController extends AbstractModuleController
     protected function translate($id, array $arguments = [])
     {
         return $this->translator->translateById($id, $arguments, null, null, 'ContentTransfer', 'Shel.Neos.TransferContent');
+    }
+
+    /**
+     * @param Site $sourceSite
+     *
+     * @param array $dimensions e.g. ['country' => ['de'],'language' => ['en']]
+     * @param array $targetDimensions e.g. ['country' => 'de','language' => 'en']
+     *
+     * @return Context
+     */
+    public function getDimensionContext(Site $sourceSite, array $dimensions, array $targetDimensions): Context
+    {
+        return $this->contextFactory->create([
+            'currentSite' => $sourceSite,
+            'dimensions' => $dimensions,
+            'targetDimensions' => $targetDimensions,
+            'invisibleContentShown' => true,
+            'inaccessibleContentShown' => true
+        ]);
     }
 }
