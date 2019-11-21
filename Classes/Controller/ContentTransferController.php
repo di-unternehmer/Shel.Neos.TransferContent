@@ -66,9 +66,10 @@ class ContentTransferController extends AbstractModuleController
      * @param Site $sourceSite
      * @param Site $targetSite
      * @param string $targetParentNodePath
+     * @param array $modes
      * @param string $mode
      */
-    public function indexAction(Site $sourceSite = null, Site $targetSite = null, $targetParentNodePath = '', $mode = '')
+    public function indexAction(Site $sourceSite = null, Site $targetSite = null, $targetParentNodePath = '', $modes = [], $mode = 'copy')
     {
         $sites = $this->siteRepository->findOnline();
 
@@ -77,12 +78,13 @@ class ContentTransferController extends AbstractModuleController
             'sourceSite' => $sourceSite,
             'targetSite' => $targetSite,
             'targetParentNodePath' => $targetParentNodePath,
-            'modes' => $this->getModes()
+            'modes' => $this->getModes(),
+            'mode' => $mode
         ]);
     }
 
     /**
-     * prepare categories for select box
+     * prepare modes for select box
      *
      * @return array
      */
@@ -180,7 +182,9 @@ class ContentTransferController extends AbstractModuleController
                         $this->redirect('index', null, null, [
                             'sourceSite' => $sourceSite,
                             'targetSite' => $targetSite,
-                            'targetParentNodePath' => $targetParentNodePath
+                            'targetParentNodePath' => $targetParentNodePath,
+                            'modes' => $this->getModes(),
+                            'mode' => $mode
                         ]);
                     }
 
@@ -239,7 +243,7 @@ class ContentTransferController extends AbstractModuleController
             'sourceSite' => $sourceSite,
             'targetSite' => $targetSite,
             'targetParentNodePath' => $targetParentNodePath,
-            'modes' => $this->getModes()
+            'mode' => $mode
         ]);
     }
 
