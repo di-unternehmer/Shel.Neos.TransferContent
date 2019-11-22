@@ -1,0 +1,83 @@
+# Add your additional dimension her, only the default dimension is not necessary
+
+Shel:
+  Neos:
+    TransferContent:
+      -
+        dimensions:
+          language:
+            - en
+          country:
+            - de
+        targetDimensions:
+          language: 'en'
+          country: 'de'
+
+      -
+        dimensions:
+          language:
+            - fr
+          country:
+            - de
+        targetDimensions:
+          language: 'fr'
+          country: 'de'
+
+      -
+        dimensions:
+          language:
+            - de
+          country:
+            - at
+        targetDimensions:
+          language: 'de'
+          country: 'at'
+
+      -
+        dimensions:
+          language:
+            - en
+          country:
+            - at
+        targetDimensions:
+          language: 'en'
+          country: 'at'
+
+      -
+        dimensions:
+          language:
+            - fr
+          country:
+            - at
+        targetDimensions:
+          language: 'fr'
+          country: 'at'
+      -
+        dimensions:
+          language:
+            - de
+          country:
+            - ch
+        targetDimensions:
+          language: 'de'
+          country: 'ch'
+
+      -
+        dimensions:
+          language:
+            - en
+          country:
+            - ch
+        targetDimensions:
+          language: 'en'
+          country: 'ch'
+
+      -
+        dimensions:
+          language:
+            - fr
+          country:
+            - ch
+        targetDimensions:
+          language: 'fr'
+          country: 'ch'

@@ -27,7 +27,11 @@ Then run `composer update` in your project directory.
 
 ## How to use
 
-TODO
+In the backend module you can choose to move or to copy a tree.
+It's only in the mode `move` possible to keep the dimensions in sync.
+So if you want to keep e.g. your translated pages in sync and move them as well, you can do so.
+You have to define your dimension you want in a Settings.yaml. An example is available here: `Configuration\Settings.TransferContent.Dimensions.yaml.example`
+In the settings are only additional dimension to be set, the default dimension is always used. 
 
 ## Contributions
 
